@@ -28,7 +28,7 @@ Amazon Firehose       buffer and deliver
   Analysis            Pandas + Matplotlib
 ```
 
-## What each service does
+## What Each Service Does
 
 | Service | Role |
 |---|---|
@@ -39,7 +39,7 @@ Amazon Firehose       buffer and deliver
 | Glue | Crawls S3 and registers the schema in the Data Catalog |
 | Athena | Queries the cataloged files directly with SQL |
 
-## The data
+## The Data
 
 Daily price records for 66 tickers across technology, finance, retail, healthcare, energy, and industrials. The Alpha Vantage daily endpoint returns 100 data points per company, so a complete run produces **6,600 records**.
 
@@ -72,7 +72,7 @@ Each record is flattened to:
 | `stock_analysis.ipynb` | Pandas and Matplotlib analysis of the query results |
 | `results.csv` | Exported Athena output (396 rows), input for the notebook |
 
-## Running it
+## Running It
 
 ### 1. Set your API key
 
@@ -84,7 +84,7 @@ ALPHA_VANTAGE_API_KEY = your_key_here
 
 Free keys are available at [alphavantage.co](https://www.alphavantage.co/support/#api-key).
 
-### 2. AWS resources
+### 2. AWS Resources
 
 You'll need, in the same region:
 
@@ -107,14 +107,14 @@ Export the Athena results as CSV and upload it to the notebook. `stock_analysis.
 
 **Note on reproducibility:** the notebook reads from the exported CSV rather than querying Athena directly, so reproducing the charts requires running the query and exporting the results first. Connecting the notebook straight to Athena or S3 would remove that manual step.
 
-## Notes and limitations
+## Notes and Limitations
 
 - **Rate limiting** is the main constraint. The free Alpha Vantage tier limits request frequency, which is why the producer retries with backoff and pauses 50ms between `put_record` calls.
 - **The `requests` library is installed at runtime** via `pip install --target /tmp`. This works but is slow and fragile — a Lambda layer or a packaged deployment would be the correct approach.
 - **"Near real-time"** is the honest description. The source publishes daily bars, so the pipeline streams historical records as they're fetched rather than reacting to live market movement. The architecture would support genuine real-time data unchanged; the constraint is the source, not the design.
 - **The analysis metric** — average signed daily change — measures drift rather than volatility, since gains and losses cancel. Measuring volatility would call for a standard deviation or an absolute change.
 
-## Built with
+## Built With
 
 Python · Pandas · Matplotlib · SQL · AWS Lambda · Kinesis Data Streams · Firehose · S3 · Glue · Athena
 
